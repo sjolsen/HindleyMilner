@@ -6,7 +6,6 @@ module Free {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
   open import Util
   open import Relation.Nullary
   open import Relation.Binary
-  open import Function
 
 
 
@@ -16,8 +15,10 @@ module Free {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
     Funcᵣ : (τ₀ τ₁ : Type)     → α ∈free₀ τ₁ → α ∈free₀ Func τ₀ τ₁
 
   private
-    ∈free₀-elim₀ : ∀ {α β} → α ∈free₀ TVar β → α ≡ₜᵥ β
-    ∈free₀-elim₀ (TVar _ α≡β) = α≡β
+    ∈free₀-elim₀ : ∀ {α β} {p} {P : Set p}
+                 → (α ≡ₜᵥ β         → P)
+                 → (α ∈free₀ TVar β → P)
+    ∈free₀-elim₀ p (TVar _ α≡β) = p α≡β
 
     ∈free₀-elim₂ : ∀ {α τ₀ τ₁} {p} {P : Set p}
                  → (α ∈free₀ τ₀         → P)
@@ -29,7 +30,7 @@ module Free {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
   _∈free₀?_ : Decidable _∈free₀_
   α ∈free₀? TVar β     = if? (α ≟ₜᵥ β)
                            (λ α≡β → yes (TVar β α≡β))
-                           (λ α≢β → no  (α≢β ∘ ∈free₀-elim₀))
+                           (λ α≢β → no  (∈free₀-elim₀ α≢β))
   α ∈free₀? Prim ι     = no (λ ())
   α ∈free₀? Func τ₀ τ₁ = if₂? (α ∈free₀? τ₀)
                               (α ∈free₀? τ₁)
