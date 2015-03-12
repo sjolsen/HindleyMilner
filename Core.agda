@@ -2,6 +2,7 @@ open import Relation.Binary using (DecSetoid)
 module Core {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
             {c₁ ℓ₁} (typeVariable  : DecSetoid c₁ ℓ₁) where
   open import Level public using (_⊔_)
+  open import Relation.Nullary
   open import Relation.Binary
 
   open DecSetoid primitiveType public using ()
@@ -19,3 +20,9 @@ module Core {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
               refl    to ≡ₜᵥ-refl;
               sym     to ≡ₜᵥ-sym;
               trans   to ≡ₜᵥ-trans)
+
+  _≢ᵢ_ : PrimitiveType → PrimitiveType → Set ℓ₀
+  ι ≢ᵢ κ = ¬ (ι ≡ᵢ κ)
+
+  _≢ₜᵥ_ : TypeVariable → TypeVariable → Set ℓ₁
+  α ≢ₜᵥ β = ¬ (α ≡ₜᵥ β)

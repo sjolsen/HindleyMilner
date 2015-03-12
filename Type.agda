@@ -21,6 +21,9 @@ module Type {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
     Prim : (ι κ : PrimitiveType) → ι  ≡ᵢ  κ             → Prim ι     ≡ₜ Prim κ
     Func : (τ₀ τ₁ τ₂ τ₃ : Type)  → τ₀ ≡ₜ  τ₂ → τ₁ ≡ₜ τ₃ → Func τ₀ τ₁ ≡ₜ Func τ₂ τ₃
 
+  _≢ₜ_ : Type → Type → Set (c₀ ⊔ c₁ ⊔ ℓ₀ ⊔ ℓ₁)
+  τ₀ ≢ₜ τ₁ = ¬ τ₀ ≡ₜ τ₁
+
   private
     ≡ₜ-elim₀ : ∀ {α β} → TVar α ≡ₜ TVar β → α ≡ₜᵥ β
     ≡ₜ-elim₀ (TVar _ _ α≡β) = α≡β
@@ -53,3 +56,17 @@ module Type {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
   Prim _     ≟ₜ Func _  _  = no (λ ())
   Func _  _  ≟ₜ TVar _     = no (λ ())
   Func _  _  ≟ₜ Prim _     = no (λ ())
+
+
+
+  open import Data.Vec public using (Vec) renaming ([] to nil; _∷_ to cons)
+  open import Data.Nat using (ℕ)
+
+  Quantifiers : ℕ → Set c₁
+  Quantifiers n = Vec TypeVariable n
+
+  record TypeScheme (n : ℕ) : Set (c₀ ⊔ c₁) where
+    constructor Forall
+    field
+      quantifiers : Quantifiers n
+      core        : Type
