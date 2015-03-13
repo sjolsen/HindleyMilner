@@ -15,6 +15,9 @@ module Free {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
     Funcₗ : {τ₀ τ₁ : Type}     → α ∈free₀ τ₀ → α ∈free₀ Func τ₀ τ₁
     Funcᵣ : {τ₀ τ₁ : Type}     → α ∈free₀ τ₁ → α ∈free₀ Func τ₀ τ₁
 
+  _∉free₀_ : TypeVariable → Type → Set (c₀ ⊔ c₁ ⊔ ℓ₀ ⊔ ℓ₁)
+  α ∉free₀ τ = ¬ α ∈free₀ τ
+
   private
     ∈free₀-elim₀ : ∀ {α β} {p} {P : Set p}
                  → (α ≡ₜᵥ β         → P)
@@ -53,6 +56,9 @@ module Free {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
          → α ≢ₜᵥ β₀
          → α ∈freeₙ (Forall βₛ           τ)
          → α ∈freeₙ (Forall (cons β₀ βₛ) τ)
+
+  _∉freeₙ_ : ∀ {n} → TypeVariable → TypeScheme n → Set (c₀ ⊔ c₁ ⊔ ℓ₀ ⊔ ℓ₁)
+  α ∉freeₙ σ = ¬ α ∈freeₙ σ
 
   private
     ∈freeₙ-elim₀ : ∀ {α τ} {p} {P : Set p}

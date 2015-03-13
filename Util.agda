@@ -3,6 +3,7 @@ module Util where
   open import Relation.Nullary
   open import Relation.Binary
   open import Relation.Binary.PropositionalEquality
+  open import Function
 
   if? : ∀ {p q} {P : Set p} {Q : Set q} → Dec P → (P → Q) → (¬ P → Q) → Q
   if? (yes p) q₁ q₂ = q₁  p
@@ -20,7 +21,15 @@ module Util where
   if₂? (no ¬p) (yes q) _  _   ¬pq _    = ¬pq  ¬p  q
   if₂? (no ¬p) (no ¬q) _  _   _   ¬p¬q = ¬p¬q ¬p ¬q
 
-  -- cong-rel : ∀ {c ℓ} {X : Set c}
-  --          → (_~_ : Rel X ℓ)
-  --          → ∀ {a b} → a ≡ b → a ~ b
-  -- cong-rel _~_ refl = {!!}
+  if : ∀ {p q} {P : Set p} {Q : Set q} → Dec P → Q → Q → Q
+  if p q₁ q₂ = if? p (const q₁) (const q₂)
+
+  if₂ : ∀ {p q r} {P : Set p} {Q : Set q} {R : Set r}
+      → Dec P → Dec Q
+      → R → R → R → R
+      → R
+  if₂ p q r₁ r₂ r₃ r₄ = if₂? p q
+                          (const (const r₁))
+                          (const (const r₂))
+                          (const (const r₃))
+                          (const (const r₄))

@@ -60,7 +60,7 @@ module Type {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
 
 
   open import Data.Vec public using (Vec) renaming ([] to nil; _∷_ to cons)
-  open import Data.Nat using (ℕ)
+  open import Data.Nat public using (ℕ; zero; suc)
 
   Quantifiers : ℕ → Set c₁
   Quantifiers n = Vec TypeVariable n
@@ -70,3 +70,4 @@ module Type {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
     field
       quantifiers : Quantifiers n
       core        : Type
+  open TypeScheme public
