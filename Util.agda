@@ -1,9 +1,12 @@
 module Util where
   open import Level using (_⊔_)
   open import Relation.Nullary
+  open import Relation.Unary
   open import Relation.Binary
   open import Relation.Binary.PropositionalEquality
   open import Function
+  open import Data.Vec
+
 
   if? : ∀ {p q} {P : Set p} {Q : Set q} → Dec P → (P → Q) → (¬ P → Q) → Q
   if? (yes p) q₁ q₂ = q₁  p
@@ -33,3 +36,8 @@ module Util where
                           (const (const r₂))
                           (const (const r₃))
                           (const (const r₄))
+
+
+  data all {a p} {A : Set a} (P : Pred A p) : ∀ {n} → Vec A n → Set (a ⊔ p) where
+    nil  :                                             all P []
+    cons : ∀ {a₀ n} {aₛ : Vec A n} → P a₀ → all P aₛ → all P (a₀ ∷ aₛ)

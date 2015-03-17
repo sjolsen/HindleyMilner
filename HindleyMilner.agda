@@ -67,5 +67,28 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
   bar = Poly (Mono (Func (TVar₁ ≡ₜᵥ-refl) (TVar₁ ≡ₜᵥ-refl))) Mono
 
 
-  -- data _⊑_ : ∀ {m n} → TypeScheme m → TypeScheme n → Set (c₀ ⊔ c₁ ⊔ ℓ₀ ⊔ ℓ₁) where
-  --   ⊑-intro :
+  open import Function
+
+  _all∉freeₙ_ : ∀ {m n} → Vec TypeVariable m → TypeScheme n → Set (c₀ ⊔ c₁ ⊔ ℓ₀ ⊔ ℓ₁)
+  αₛ all∉freeₙ σ = all (flip _∉freeₙ_ σ) αₛ
+
+
+  data _⊑_ : ∀ {m n} → TypeScheme m → TypeScheme n → Set (c₀ ⊔ c₁ ⊔ ℓ₀ ⊔ ℓ₁) where
+    ⊑-intro : ∀ {n m τ τ′ τₛ}
+                {αₛ : Quantifiers n}
+                {βₛ : Quantifiers m}
+            → τ′ instantiates (Forall αₛ τ) given τₛ
+            → βₛ all∉freeₙ (Forall αₛ τ)
+            → (Forall αₛ τ) ⊑ (Forall βₛ τ′)
+
+
+  -- ∀α.α→α ⊑ int→int
+  foo′ : Forall (cons α nil) (Func (TVar α)   (TVar α))
+       ⊑ Forall         nil  (Func (Prim int) (Prim int))
+  foo′ = ⊑-intro foo nil
+
+  open import Relation.Nullary
+
+  asdf : ¬ (Forall         nil  (Func (Prim int) (Prim int))
+         ⊑  Forall (cons α nil) (Func (TVar α)   (TVar α)))
+  asdf (⊑-intro () x₁)
