@@ -67,6 +67,8 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
   bar = Poly (Mono (Func (TVar₁ ≡ₜᵥ-refl) (TVar₁ ≡ₜᵥ-refl))) Mono
 
 
+  open import Data.Product
+  open import Relation.Nullary.Negation
   open import Function
 
   _all∉freeₙ_ : ∀ {m n} → Vec TypeVariable m → TypeScheme n → Set (c₀ ⊔ c₁ ⊔ ℓ₀ ⊔ ℓ₁)
@@ -81,14 +83,40 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
             → βₛ all∉freeₙ (Forall αₛ τ)
             → (Forall αₛ τ) ⊑ (Forall βₛ τ′)
 
+  private
+    ⊑-elim₀ : ∀ {n m τ τ′}
+                {αₛ : Quantifiers n}
+                {βₛ : Quantifiers m}
+            → (Forall αₛ τ) ⊑ (Forall βₛ τ′)
+            → Σ[ τₛ ∈ Vec Type n ] τ′ instantiates (Forall αₛ τ) given τₛ
+    ⊑-elim₀ (⊑-intro {τₛ = τₛ} x _) = τₛ , x
 
-  -- ∀α.α→α ⊑ int→int
-  foo′ : Forall (cons α nil) (Func (TVar α)   (TVar α))
-       ⊑ Forall         nil  (Func (Prim int) (Prim int))
-  foo′ = ⊑-intro foo nil
+    ⊑-elim₁ : ∀ {n m τ τ′}
+                {αₛ : Quantifiers n}
+                {βₛ : Quantifiers m}
+            → (Forall αₛ τ) ⊑ (Forall βₛ τ′)
+            → βₛ all∉freeₙ (Forall αₛ τ)
+    ⊑-elim₁ (⊑-intro _ x) = x
+
 
   open import Relation.Nullary
 
-  asdf : ¬ (Forall         nil  (Func (Prim int) (Prim int))
-         ⊑  Forall (cons α nil) (Func (TVar α)   (TVar α)))
-  asdf (⊑-intro () x₁)
+  replace-refl : ∀ {n τ β} {αₛ : Quantifiers n} → Forall αₛ τ ≈[ TVar β / β ] Forall αₛ τ
+  replace-refl {τ = TVar α} {β = β} {αₛ = nil} with α ≟ₜᵥ β
+  ... | yes α≡β = Mono {!TVar₁ α≡β!} -- Gives TVar α ≈[ TVar β / β ]₀ TVar β
+                                     -- Need  TVar α ≈[ TVar β / β ]₀ TVar α
+  ... | no  α≢β = Mono (TVar₀ α≢β)
+  replace-refl {τ = Prim ι} {β = β} {αₛ = nil} = {!!}
+  replace-refl {τ = Func τ₀ τ₁} {β = β} {αₛ = nil} = {!!}
+  replace-refl {τ = τ} {β = β} {αₛ = cons α₀ αₛ} = {!!}
+
+  instantiates-refl : ∀ {n τ} {αₛ : Quantifiers n} → τ instantiates Forall αₛ τ given (vmap TVar αₛ)
+  instantiates-refl         {αₛ =        nil} = Mono
+  instantiates-refl {τ = τ} {αₛ = cons α₀ αₛ} with α₀ ∈freeₙ? (Forall αₛ τ)
+  ... | yes y = Poly {τ′ = τ} {!!} instantiates-refl
+  ... | no  n = Poly {τ′ = τ} {!!} instantiates-refl
+
+  -- Reflexive
+  ⊑-refl : ∀ {n} {σ : TypeScheme n} → σ ⊑ σ
+  ⊑-refl {σ = Forall          nil τ} = ⊑-intro Mono nil
+  ⊑-refl {σ = Forall (cons α₀ αₛ) τ} = ⊑-intro {!!} {!!}
