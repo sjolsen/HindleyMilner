@@ -27,11 +27,11 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
 
   open import Util
 
-  _≈[_/_]₀_ : Type → Type → TypeVariable → Type → Set (c₀ ⊔ c₁ ⊔ ℓ₀ ⊔ ℓ₁)
-  τ′ ≈[ υ / β ]₀ τ = τ′ ≡ₜ ([ υ / β ]₀ τ)
+  _≡[_/_]₀_ : Type → Type → TypeVariable → Type → Set (c₀ ⊔ c₁ ⊔ ℓ₀ ⊔ ℓ₁)
+  τ′ ≡[ υ / β ]₀ τ = τ′ ≡ₜ ([ υ / β ]₀ τ)
 
-  _≈[_/_]_ : ∀ {n} → Type → Type → TypeVariable → TypeScheme n → Set (c₀ ⊔ c₁ ⊔ ℓ₀ ⊔ ℓ₁)
-  τ′ ≈[ υ / β ] σ = τ′ ≡ₜ ([ υ / β ] σ)
+  _≡[_/_]_ : ∀ {n} → Type → Type → TypeVariable → TypeScheme n → Set (c₀ ⊔ c₁ ⊔ ℓ₀ ⊔ ℓ₁)
+  τ′ ≡[ υ / β ] σ = τ′ ≡ₜ ([ υ / β ] σ)
 
 
   data _instantiates_given_ : ∀ {n}
@@ -42,7 +42,7 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
     Mono : ∀ {τ}
          → τ instantiates (Forall nil τ) given nil
     Poly : ∀ {τ″ τ′ υ₀ α₀ τ n} {υₛ : Vec Type n} {αₛ : Quantifiers n}
-         → τ″ ≈[ υ₀ / α₀ ] (Forall αₛ τ′)
+         → τ″ ≡[ υ₀ / α₀ ] (Forall αₛ τ′)
          → τ′ instantiates (Forall          αₛ  τ) given          υₛ
          → τ″ instantiates (Forall (cons α₀ αₛ) τ) given (cons υ₀ υₛ)
 
@@ -106,14 +106,14 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
   open import Relation.Nullary
   open import Relation.Binary
 
-  replace-refl₀ : ∀ {τ β} → τ ≈[ TVar β / β ]₀ τ
+  replace-refl₀ : ∀ {τ β} → τ ≡[ TVar β / β ]₀ τ
   replace-refl₀ {TVar α} {β} with α ≟ₜᵥ β
   ... | yes α≡β = TVar α≡β
   ... | no  α≢β = TVar ≡ₜᵥ-refl
   replace-refl₀ {Prim ι}     = Prim ≡ᵢ-refl
   replace-refl₀ {Func τ₀ τ₁} = Func replace-refl₀ replace-refl₀
 
-  replace-refl : ∀ {n τ β} {αₛ : Quantifiers n} → τ ≈[ TVar β / β ] Forall αₛ τ
+  replace-refl : ∀ {n τ β} {αₛ : Quantifiers n} → τ ≡[ TVar β / β ] Forall αₛ τ
   replace-refl {αₛ = nil} = replace-refl₀
   replace-refl {τ = τ} {β = β} {αₛ = cons α₀ αₛ} with β ∈freeₙ? (Forall (cons α₀ αₛ) τ)
   ... | yes _ = replace-refl {αₛ = αₛ}
@@ -128,9 +128,19 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
   all∉freeₙ-refl {τ = τ} {αₛ = cons α₀ αₛ} = cons (∈freeₙ-elimₗ (flip _$_ ≡ₜᵥ-refl))
                                                   (all-map ∈freeₙ-elimᵣ all∉freeₙ-refl)
 
-  -- Reflexive
   ⊑-refl : ∀ {n} → Reflexive (_⊑_ {n = n})
   ⊑-refl {x = Forall          nil τ} = ⊑-intro Mono nil
   ⊑-refl {x = Forall (cons α₀ αₛ) τ} = ⊑-intro instantiates-refl all∉freeₙ-refl
 
-  -- Symmetric
+
+  data _≈_ : ∀ {n} (σ σ′ : TypeScheme n) → Set (c₀ ⊔ c₁ ⊔ ℓ₀ ⊔ ℓ₁) where
+    Bidir : ∀ {n} {σ σ′ : TypeScheme n}
+          → σ  ⊑  σ′
+          → σ′ ⊑  σ
+          → σ  ≈  σ′
+
+  ≈-refl : ∀ {n} → Reflexive (_≈_ {n = n})
+  ≈-refl = Bidir ⊑-refl ⊑-refl
+
+  ≈-sym : ∀ {n} → Symmetric (_≈_ {n = n})
+  ≈-sym (Bidir i⊑j j⊑i) = Bidir j⊑i i⊑j
