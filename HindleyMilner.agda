@@ -133,18 +133,37 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
   ⊑-refl {x = Forall (cons α₀ αₛ) τ} = ⊑-intro instantiates-refl all∉freeₙ-refl
 
 
+
+  open import Data.Product
+
+  instantiates-trans : ∀ {τ υ φ n₁ n₂}
+                         {αₛ : Quantifiers n₁}
+                         {βₛ : Quantifiers n₂}
+                         {τ→υ : Vec Type n₁}
+                         {υ→φ : Vec Type n₂}
+                     → υ instantiates Forall αₛ τ given τ→υ
+                     → φ instantiates Forall βₛ υ given υ→φ
+                     → Σ[ τ→φ ∈ Vec Type n₁ ] φ instantiates Forall αₛ τ given τ→φ
+  instantiates-trans {αₛ = nil}        υ‿αₛτ‿τ→υ φ‿βₛυ‿υ→φ = nil , {!!}
+  instantiates-trans {αₛ = cons α₀ αₛ} υ‿αₛτ‿τ→υ φ‿βₛυ‿υ→φ = {!!}
+
+  all∉freeₙ-trans : ∀ {τ υ n₁ n₂}
+                      {αₛ : Quantifiers n₁}
+                      {βₛ : Quantifiers n₂}
+                      {γₛ : Quantifiers n₂}
+                  → βₛ all∉freeₙ Forall αₛ τ
+                  → γₛ all∉freeₙ Forall βₛ υ
+                  → γₛ all∉freeₙ Forall αₛ τ
+  all∉freeₙ-trans βₛ∉αₛτ γₛ∉βₛυ = {!!}
+
   ⊑-trans : ∀ {n} → Transitive (_⊑_ {n = n})
   ⊑-trans {i = Forall αₛ τ}
           {j = Forall βₛ υ}
           {k = Forall γₛ φ}
           (⊑-intro {n = n} {τₛ = τ→υ} υ‿αₛτ‿τ→υ βₛ∉αₛτ)
           (⊑-intro         {τₛ = υ→φ} φ‿βₛυ‿υ→φ γₛ∉βₛυ)
-    = let τ→φ : Vec Type n
-          τ→φ = {!!}
-          φ‿αₛτ‿τ→φ : φ instantiates Forall αₛ τ given τ→φ
-          φ‿αₛτ‿τ→φ = {!!}
-      in ⊑-intro φ‿αₛτ‿τ→φ
-                 {!!}
+    = ⊑-intro (proj₂ (instantiates-trans υ‿αₛτ‿τ→υ φ‿βₛυ‿υ→φ))
+              (all∉freeₙ-trans βₛ∉αₛτ γₛ∉βₛυ)
 
 
   data _≈_ : ∀ {n} (σ σ′ : TypeScheme n) → Set (c₀ ⊔ c₁ ⊔ ℓ₀ ⊔ ℓ₁) where
