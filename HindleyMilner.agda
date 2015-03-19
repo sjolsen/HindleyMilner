@@ -104,6 +104,7 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
 
 
   open import Relation.Nullary
+  open import Relation.Binary
 
   replace-refl₀ : ∀ {τ β} → τ ≈[ TVar β / β ]₀ τ
   replace-refl₀ {TVar α} {β} with α ≟ₜᵥ β
@@ -128,6 +129,8 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
                                                   (all-map ∈freeₙ-elimᵣ all∉freeₙ-refl)
 
   -- Reflexive
-  ⊑-refl : ∀ {n} {σ : TypeScheme n} → σ ⊑ σ
-  ⊑-refl {σ = Forall          nil τ} = ⊑-intro Mono nil
-  ⊑-refl {σ = Forall (cons α₀ αₛ) τ} = ⊑-intro instantiates-refl all∉freeₙ-refl
+  ⊑-refl : ∀ {n} → Reflexive (_⊑_ {n = n})
+  ⊑-refl {x = Forall          nil τ} = ⊑-intro Mono nil
+  ⊑-refl {x = Forall (cons α₀ αₛ) τ} = ⊑-intro instantiates-refl all∉freeₙ-refl
+
+  -- Symmetric
