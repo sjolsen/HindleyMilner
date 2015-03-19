@@ -60,21 +60,20 @@ module Free {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
   _∉freeₙ_ : ∀ {n} → TypeVariable → TypeScheme n → Set (c₀ ⊔ c₁ ⊔ ℓ₀ ⊔ ℓ₁)
   α ∉freeₙ σ = ¬ α ∈freeₙ σ
 
-  private
-    ∈freeₙ-elim₀ : ∀ {α τ} {p} {P : Set p}
-                 → (α ∈free₀ τ              → P)
-                 → (α ∈freeₙ (Forall nil τ) → P)
-    ∈freeₙ-elim₀ p (Mono α∈freeτ) = p α∈freeτ
+  ∈freeₙ-elim₀ : ∀ {α τ} {p} {P : Set p}
+               → (α ∈free₀ τ              → P)
+               → (α ∈freeₙ (Forall nil τ) → P)
+  ∈freeₙ-elim₀ p (Mono α∈freeτ) = p α∈freeτ
 
-    ∈freeₙ-elimₗ : ∀ {α τ n β₀} {βₛ : Quantifiers n} {p} {P : Set p}
-                 → (α ≢ₜᵥ β₀                         → P)
-                 → (α ∈freeₙ (Forall (cons β₀ βₛ) τ) → P)
-    ∈freeₙ-elimₗ p (Poly α≢β _) = p α≢β
+  ∈freeₙ-elimₗ : ∀ {α τ n β₀} {βₛ : Quantifiers n} {p} {P : Set p}
+               → (α ≢ₜᵥ β₀                         → P)
+               → (α ∈freeₙ (Forall (cons β₀ βₛ) τ) → P)
+  ∈freeₙ-elimₗ p (Poly α≢β _) = p α≢β
 
-    ∈freeₙ-elimᵣ : ∀ {α τ n β₀} {βₛ : Quantifiers n} {p} {P : Set p}
-                 → (α ∈freeₙ (Forall βₛ           τ) → P)
-                 → (α ∈freeₙ (Forall (cons β₀ βₛ) τ) → P)
-    ∈freeₙ-elimᵣ p (Poly _ α∈freeβ) = p α∈freeβ
+  ∈freeₙ-elimᵣ : ∀ {α τ n β₀} {βₛ : Quantifiers n} {p} {P : Set p}
+               → (α ∈freeₙ (Forall βₛ           τ) → P)
+               → (α ∈freeₙ (Forall (cons β₀ βₛ) τ) → P)
+  ∈freeₙ-elimᵣ p (Poly _ α∈freeβ) = p α∈freeβ
 
   _∈freeₙ?_ : ∀ {n} (α : TypeVariable) (σ : TypeScheme n) → Dec (α ∈freeₙ σ)
   α ∈freeₙ? Forall nil          τ = if? (α ∈free₀? τ)

@@ -41,3 +41,8 @@ module Util where
   data all {a p} {A : Set a} (P : Pred A p) : ∀ {n} → Vec A n → Set (a ⊔ p) where
     nil  :                                             all P []
     cons : ∀ {a₀ n} {aₛ : Vec A n} → P a₀ → all P aₛ → all P (a₀ ∷ aₛ)
+
+  all-map : ∀ {a p q n} {A : Set a} {P : Pred A p} {Q : Pred A q} {aₛ : Vec A n}
+          → (∀ {x} → P x → Q x) → all P aₛ → all Q aₛ
+  all-map p→q nil          = nil
+  all-map p→q (cons x₀ xₛ) = cons (p→q x₀) (all-map p→q xₛ)
