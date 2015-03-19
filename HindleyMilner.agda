@@ -133,6 +133,20 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
   ⊑-refl {x = Forall (cons α₀ αₛ) τ} = ⊑-intro instantiates-refl all∉freeₙ-refl
 
 
+  ⊑-trans : ∀ {n} → Transitive (_⊑_ {n = n})
+  ⊑-trans {i = Forall αₛ τ}
+          {j = Forall βₛ υ}
+          {k = Forall γₛ φ}
+          (⊑-intro {n = n} {τₛ = τ→υ} υ‿αₛτ‿τ→υ βₛ∉αₛτ)
+          (⊑-intro         {τₛ = υ→φ} φ‿βₛυ‿υ→φ γₛ∉βₛυ)
+    = let τ→φ : Vec Type n
+          τ→φ = {!!}
+          φ‿αₛτ‿τ→φ : φ instantiates Forall αₛ τ given τ→φ
+          φ‿αₛτ‿τ→φ = {!!}
+      in ⊑-intro φ‿αₛτ‿τ→φ
+                 {!!}
+
+
   data _≈_ : ∀ {n} (σ σ′ : TypeScheme n) → Set (c₀ ⊔ c₁ ⊔ ℓ₀ ⊔ ℓ₁) where
     Bidir : ∀ {n} {σ σ′ : TypeScheme n}
           → σ  ⊑  σ′
@@ -144,3 +158,9 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
 
   ≈-sym : ∀ {n} → Symmetric (_≈_ {n = n})
   ≈-sym (Bidir i⊑j j⊑i) = Bidir j⊑i i⊑j
+
+  ≈-trans : ∀ {n} → Transitive (_≈_ {n = n})
+  ≈-trans (Bidir i⊑j j⊑i) (Bidir j⊑k k⊑j) = Bidir (⊑-trans i⊑j j⊑k) (⊑-trans k⊑j j⊑i)
+
+  ⊑-antisym : ∀ {n} → Antisymmetric (_≈_ {n = n}) _⊑_
+  ⊑-antisym x⊑y y⊑x = Bidir x⊑y y⊑x
