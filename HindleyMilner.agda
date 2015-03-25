@@ -49,28 +49,28 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
 
 
   -- int→int instantiates ∀α.α→α given [int]
-  postulate
-    int : PrimitiveType
-    α β : TypeVariable
+  -- postulate
+  --   int : PrimitiveType
+  --   α β : TypeVariable
 
-  foo : Func (Prim int) (Prim int) instantiates
-        Forall (cons α nil) (Func (TVar α) (TVar α)) given
-        (cons (Prim int) nil)
-  foo = Poly (Func lemma lemma) (Mono ≡ₜ-refl)
-    where lemma : Prim int ≡ₜ ([ Prim int / α ]₀ TVar α)
-          lemma with α ≟ₜᵥ α
-          ... | yes _ = Prim ≡ᵢ-refl
-          ... | no  n = contradiction ≡ₜᵥ-refl n
+  -- foo : Func (Prim int) (Prim int) instantiates
+  --       Forall (cons α nil) (Func (TVar α) (TVar α)) given
+  --       (cons (Prim int) nil)
+  -- foo = Poly (Func lemma lemma) (Mono ≡ₜ-refl)
+  --   where lemma : Prim int ≡ₜ ([ Prim int / α ]₀ TVar α)
+  --         lemma with α ≟ₜᵥ α
+  --         ... | yes _ = Prim ≡ᵢ-refl
+  --         ... | no  n = contradiction ≡ₜᵥ-refl n
 
-  -- β→β instantiates ∀α.α→α given [β]
-  bar : Func (TVar β) (TVar β) instantiates
-        Forall (cons α nil) (Func (TVar α) (TVar α)) given
-        (cons (TVar β) nil)
-  bar = Poly (Func lemma lemma) (Mono ≡ₜ-refl)
-    where lemma : TVar β ≡ₜ ([ TVar β / α ]₀ TVar α)
-          lemma with α ≟ₜᵥ α
-          ... | yes _ = TVar ≡ₜᵥ-refl
-          ... | no  n = contradiction ≡ₜᵥ-refl n
+  -- -- β→β instantiates ∀α.α→α given [β]
+  -- bar : Func (TVar β) (TVar β) instantiates
+  --       Forall (cons α nil) (Func (TVar α) (TVar α)) given
+  --       (cons (TVar β) nil)
+  -- bar = Poly (Func lemma lemma) (Mono ≡ₜ-refl)
+  --   where lemma : TVar β ≡ₜ ([ TVar β / α ]₀ TVar α)
+  --         lemma with α ≟ₜᵥ α
+  --         ... | yes _ = TVar ≡ₜᵥ-refl
+  --         ... | no  n = contradiction ≡ₜᵥ-refl n
 
 
   open import Data.Product
@@ -146,29 +146,65 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
   instantiates-resp-≡ᵣ {αₛ = nil}        υ≡τ (Mono φ≡υ)                 = Mono (≡ₜ-trans φ≡υ υ≡τ)
   instantiates-resp-≡ᵣ {αₛ = cons α₀ αₛ} υ≡τ (Poly φ-α₀υ-υ→φ φ-αₛυ-υ→φ) = Poly φ-α₀υ-υ→φ (instantiates-resp-≡ᵣ υ≡τ φ-αₛυ-υ→φ)
 
+  subs-nonfree-equiv : ∀ {τ υ φ β n}
+                         {αₛ : Quantifiers n}
+                     → υ ≡[ φ / β ] Forall αₛ τ
+                     → β ∉freeₙ Forall αₛ τ
+                     → υ ≡ₜ τ
+  subs-nonfree-equiv {τ = TVar α}     {β = β} {αₛ = nil} x y with α ≟ₜᵥ β
+  ... | yes p = contradiction (Mono (TVar (≡ₜᵥ-sym p))) y
+  ... | no ¬p = x
+  subs-nonfree-equiv {Prim ι} {αₛ = nil} (Prim x) y = Prim x
+  subs-nonfree-equiv {Func τ₀ τ₁} {β = β} {αₛ = nil} (Func x₀ x₁) y with β ∈free₀? τ₀ | β ∈free₀? τ₁
+  ... | yes p₀ | _      = contradiction (Mono (Funcₗ p₀)) y
+  ... | _      | yes p₁ = contradiction (Mono (Funcᵣ p₁)) y
+  ... | no ¬p₀ | no ¬p₁ = Func (subs-nonfree-equiv x₀ ¬p₀′)
+                               (subs-nonfree-equiv x₁ ¬p₁′)
+    where ¬p₀′ : β ∉freeₙ Forall nil τ₀
+          ¬p₀′ (Mono x) = ¬p₀ x
+          ¬p₁′ : β ∉freeₙ Forall nil τ₁
+          ¬p₁′ (Mono x) = ¬p₁ x
+  subs-nonfree-equiv {αₛ = cons α₀ αₛ} x y = {!!}
+
+  instantiates-nonfree-irrel : ∀ {τ υ n}
+                                 {αₛ : Quantifiers n}
+                                 {τ→υ : Vec Type n}
+                             → υ instantiates Forall αₛ τ given τ→υ
+                             → αₛ all∉freeₙ Forall nil τ
+                             → υ ≡ₜ τ
+  instantiates-nonfree-irrel (Mono υ≡τ) _ = υ≡τ
+  instantiates-nonfree-irrel {τ = τ} {αₛ = cons α₀ αₛ} (Poly x₀ xₛ) (cons y₀ yₛ) with α₀ ∈freeₙ? Forall nil τ
+  ... | yes y = contradiction y y₀
+  ... | no  _ = {!!}
+
   instantiates-trans : ∀ {τ υ φ n₁ n₂}
                          {αₛ : Quantifiers n₁}
                          {βₛ : Quantifiers n₂}
                          {τ→υ : Vec Type n₁}
                          {υ→φ : Vec Type n₂}
+                     → βₛ all∉freeₙ Forall αₛ τ
                      → υ instantiates Forall αₛ τ given τ→υ
                      → φ instantiates Forall βₛ υ given υ→φ
                      → Σ[ τ→φ ∈ Vec Type n₁ ] φ instantiates Forall αₛ τ given τ→φ
   instantiates-trans {αₛ  = nil}
                      {βₛ  = nil}
                      {υ→φ = nil}
+                     βₛ-αₛτ
                      (Mono υ≡τ)
                      φ-βₛυ-υ→φ
-                       = nil
-                       , instantiates-resp-≡ᵣ υ≡τ φ-βₛυ-υ→φ
-  instantiates-trans {αₛ  = nil}
+                       = nil , instantiates-resp-≡ᵣ υ≡τ φ-βₛυ-υ→φ
+  instantiates-trans {τ   = τ}
+                     {αₛ  = nil}
                      {βₛ  = cons β₀ βₛ}
                      {υ→φ = cons υ→φ₀ υ→φₛ}
+                     (cons β₀-αₛτ βₛ-αₛτ)
                      (Mono υ≡τ)
                      (Poly φ-β₀υ-υ→φ φ-βₛυ-υ→φ)
-                       = nil
-                       , instantiates-resp-≡ᵣ υ≡τ {!!}
+                       with β₀ ∈freeₙ? Forall nil τ
+  ... | yes y = contradiction y β₀-αₛτ
+  ... | no  n = nil , Mono {!!}
   instantiates-trans {αₛ = cons α₀ αₛ}
+                     βₛ-αₛτ
                      υ-αₛτ-τ→υ
                      φ-βₛυ-υ→φ
                        = {!!}
@@ -188,7 +224,7 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
           {k = Forall γₛ φ}
           (⊑-intro {n = n} {τₛ = τ→υ} υ-αₛτ-τ→υ βₛ∉αₛτ)
           (⊑-intro         {τₛ = υ→φ} φ-βₛυ-υ→φ γₛ∉βₛυ)
-    = ⊑-intro (proj₂ (instantiates-trans υ-αₛτ-τ→υ φ-βₛυ-υ→φ))
+    = ⊑-intro (proj₂ (instantiates-trans βₛ∉αₛτ υ-αₛτ-τ→υ φ-βₛυ-υ→φ))
               (all∉freeₙ-trans βₛ∉αₛτ γₛ∉βₛυ)
 
 
