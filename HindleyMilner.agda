@@ -39,8 +39,9 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
                             → TypeScheme n
                             → Vec Type n
                             → Set (c₀ ⊔ c₁ ⊔ ℓ₀ ⊔ ℓ₁) where
-    Mono : ∀ {τ}
-         → τ instantiates (Forall nil τ) given nil
+    Mono : ∀ {τ′ τ}
+         → τ′ ≡ₜ τ
+         → τ′ instantiates (Forall nil τ) given nil
     Poly : ∀ {τ″ τ′ υ₀ α₀ τ n} {υₛ : Vec Type n} {αₛ : Quantifiers n}
          → τ″ ≡[ υ₀ / α₀ ] (Forall αₛ τ′)
          → τ′ instantiates (Forall          αₛ  τ) given          υₛ
@@ -55,7 +56,7 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
   foo : Func (Prim int) (Prim int) instantiates
         Forall (cons α nil) (Func (TVar α) (TVar α)) given
         (cons (Prim int) nil)
-  foo = Poly (Func lemma lemma) Mono
+  foo = Poly (Func lemma lemma) (Mono ≡ₜ-refl)
     where lemma : Prim int ≡ₜ ([ Prim int / α ]₀ TVar α)
           lemma with α ≟ₜᵥ α
           ... | yes _ = Prim ≡ᵢ-refl
@@ -65,7 +66,7 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
   bar : Func (TVar β) (TVar β) instantiates
         Forall (cons α nil) (Func (TVar α) (TVar α)) given
         (cons (TVar β) nil)
-  bar = Poly (Func lemma lemma) Mono
+  bar = Poly (Func lemma lemma) (Mono ≡ₜ-refl)
     where lemma : TVar β ≡ₜ ([ TVar β / α ]₀ TVar α)
           lemma with α ≟ₜᵥ α
           ... | yes _ = TVar ≡ₜᵥ-refl
@@ -120,7 +121,7 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
   ... | no  _ = ≡ₜ-refl
 
   instantiates-refl : ∀ {n τ} {αₛ : Quantifiers n} → τ instantiates Forall αₛ τ given (vmap TVar αₛ)
-  instantiates-refl         {αₛ =        nil} = Mono
+  instantiates-refl         {αₛ =        nil} = Mono ≡ₜ-refl
   instantiates-refl {τ = τ} {αₛ = cons α₀ αₛ} = Poly (replace-refl {αₛ = αₛ}) instantiates-refl
 
   all∉freeₙ-refl : ∀ {n τ} {αₛ : Quantifiers n} → αₛ all∉freeₙ Forall αₛ τ
@@ -129,7 +130,7 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
                                                   (all-map ∈freeₙ-elimᵣ all∉freeₙ-refl)
 
   ⊑-refl : ∀ {n} → Reflexive (_⊑_ {n = n})
-  ⊑-refl {x = Forall          nil τ} = ⊑-intro Mono nil
+  ⊑-refl {x = Forall          nil τ} = ⊑-intro (Mono ≡ₜ-refl) nil
   ⊑-refl {x = Forall (cons α₀ αₛ) τ} = ⊑-intro instantiates-refl all∉freeₙ-refl
 
 
