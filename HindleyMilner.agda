@@ -137,6 +137,15 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
 
   open import Data.Product
 
+  instantiates-resp-≡ᵣ : ∀ {υ τ φ n}
+                           {αₛ : Quantifiers n}
+                           {υ→φ : Vec Type n}
+                       → υ ≡ₜ τ
+                       → φ instantiates Forall αₛ υ given υ→φ
+                       → φ instantiates Forall αₛ τ given υ→φ
+  instantiates-resp-≡ᵣ {αₛ = nil}        υ≡τ (Mono φ≡υ)                 = Mono (≡ₜ-trans φ≡υ υ≡τ)
+  instantiates-resp-≡ᵣ {αₛ = cons α₀ αₛ} υ≡τ (Poly φ-α₀υ-υ→φ φ-αₛυ-υ→φ) = Poly φ-α₀υ-υ→φ (instantiates-resp-≡ᵣ υ≡τ φ-αₛυ-υ→φ)
+
   instantiates-trans : ∀ {τ υ φ n₁ n₂}
                          {αₛ : Quantifiers n₁}
                          {βₛ : Quantifiers n₂}
@@ -145,11 +154,24 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
                      → υ instantiates Forall αₛ τ given τ→υ
                      → φ instantiates Forall βₛ υ given υ→φ
                      → Σ[ τ→φ ∈ Vec Type n₁ ] φ instantiates Forall αₛ τ given τ→φ
-  instantiates-trans                 {αₛ = nil}        {βₛ = nil}        (Mono υ≡τ) (Mono φ≡υ)                  = nil , Mono (≡ₜ-trans φ≡υ υ≡τ)
-  instantiates-trans {υ = υ} {φ = φ} {αₛ = nil}        {βₛ = cons β₀ βₛ} (Mono υ≡τ) (Poly φ‿β₀υ‿υ→φ φ‿βₛυ‿υ→φ) = nil , Mono (≡ₜ-trans φ≡υ υ≡τ)
-    where φ≡υ : φ ≡ₜ υ
-          φ≡υ = {!!}
-  instantiates-trans {αₛ = cons α₀ αₛ}                   υ‿αₛτ‿τ→υ φ‿βₛυ‿υ→φ = {!!}
+  instantiates-trans {αₛ  = nil}
+                     {βₛ  = nil}
+                     {υ→φ = nil}
+                     (Mono υ≡τ)
+                     φ-βₛυ-υ→φ
+                       = nil
+                       , instantiates-resp-≡ᵣ υ≡τ φ-βₛυ-υ→φ
+  instantiates-trans {αₛ  = nil}
+                     {βₛ  = cons β₀ βₛ}
+                     {υ→φ = cons υ→φ₀ υ→φₛ}
+                     (Mono υ≡τ)
+                     φ-βₛυ-υ→φ
+                       = {!!}
+                       , {!!}
+  instantiates-trans {αₛ = cons α₀ αₛ}
+                     υ-αₛτ-τ→υ
+                     φ-βₛυ-υ→φ
+                       = {!!}
 
   all∉freeₙ-trans : ∀ {τ υ n₁ n₂}
                       {αₛ : Quantifiers n₁}
@@ -164,9 +186,9 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
   ⊑-trans {i = Forall αₛ τ}
           {j = Forall βₛ υ}
           {k = Forall γₛ φ}
-          (⊑-intro {n = n} {τₛ = τ→υ} υ‿αₛτ‿τ→υ βₛ∉αₛτ)
-          (⊑-intro         {τₛ = υ→φ} φ‿βₛυ‿υ→φ γₛ∉βₛυ)
-    = ⊑-intro (proj₂ (instantiates-trans υ‿αₛτ‿τ→υ φ‿βₛυ‿υ→φ))
+          (⊑-intro {n = n} {τₛ = τ→υ} υ-αₛτ-τ→υ βₛ∉αₛτ)
+          (⊑-intro         {τₛ = υ→φ} φ-βₛυ-υ→φ γₛ∉βₛυ)
+    = ⊑-intro (proj₂ (instantiates-trans υ-αₛτ-τ→υ φ-βₛυ-υ→φ))
               (all∉freeₙ-trans βₛ∉αₛτ γₛ∉βₛυ)
 
 
