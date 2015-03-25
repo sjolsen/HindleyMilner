@@ -145,8 +145,11 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
                      → υ instantiates Forall αₛ τ given τ→υ
                      → φ instantiates Forall βₛ υ given υ→φ
                      → Σ[ τ→φ ∈ Vec Type n₁ ] φ instantiates Forall αₛ τ given τ→φ
-  instantiates-trans {αₛ = nil}        υ‿αₛτ‿τ→υ φ‿βₛυ‿υ→φ = nil , {!!}
-  instantiates-trans {αₛ = cons α₀ αₛ} υ‿αₛτ‿τ→υ φ‿βₛυ‿υ→φ = {!!}
+  instantiates-trans                 {αₛ = nil}        {βₛ = nil}        (Mono υ≡τ) (Mono φ≡υ)                  = nil , Mono (≡ₜ-trans φ≡υ υ≡τ)
+  instantiates-trans {υ = υ} {φ = φ} {αₛ = nil}        {βₛ = cons β₀ βₛ} (Mono υ≡τ) (Poly φ‿β₀υ‿υ→φ φ‿βₛυ‿υ→φ) = nil , Mono (≡ₜ-trans φ≡υ υ≡τ)
+    where φ≡υ : φ ≡ₜ υ
+          φ≡υ = {!!}
+  instantiates-trans {αₛ = cons α₀ αₛ}                   υ‿αₛτ‿τ→υ φ‿βₛυ‿υ→φ = {!!}
 
   all∉freeₙ-trans : ∀ {τ υ n₁ n₂}
                       {αₛ : Quantifiers n₁}
