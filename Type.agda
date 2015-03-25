@@ -62,6 +62,12 @@ module Type {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
   ≡ₜ-refl {Prim ι}     = Prim ≡ᵢ-refl
   ≡ₜ-refl {Func τ₀ τ₁} = Func ≡ₜ-refl ≡ₜ-refl
 
+  ≡ₜ-trans : Transitive _≡ₜ_
+  ≡ₜ-trans (TVar i≡j)         (TVar j≡k)         = TVar (≡ₜᵥ-trans i≡j j≡k)
+  ≡ₜ-trans (Prim i≡j)         (Prim j≡k)         = Prim (≡ᵢ-trans  i≡j j≡k)
+  ≡ₜ-trans (Func i₀≡j₀ i₁≡j₁) (Func j₀≡k₀ j₁≡k₁) = Func (≡ₜ-trans i₀≡j₀ j₀≡k₀)
+                                                        (≡ₜ-trans i₁≡j₁ j₁≡k₁)
+
 
 
   open import Data.Vec public using (Vec) renaming ([] to nil; _∷_ to cons; map to vmap)
