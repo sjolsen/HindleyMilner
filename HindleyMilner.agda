@@ -165,9 +165,9 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
                      {βₛ  = cons β₀ βₛ}
                      {υ→φ = cons υ→φ₀ υ→φₛ}
                      (Mono υ≡τ)
-                     φ-βₛυ-υ→φ
-                       = {!!}
-                       , {!!}
+                     (Poly φ-β₀υ-υ→φ φ-βₛυ-υ→φ)
+                       = nil
+                       , instantiates-resp-≡ᵣ υ≡τ {!!}
   instantiates-trans {αₛ = cons α₀ αₛ}
                      υ-αₛτ-τ→υ
                      φ-βₛυ-υ→φ
