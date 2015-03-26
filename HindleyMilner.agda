@@ -168,16 +168,6 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
   ... | yes p = contradiction p y
   ... | no ¬p = x
 
-  instantiates-nonfree-irrel : ∀ {τ υ n}
-                                 {αₛ : Quantifiers n}
-                                 {τ→υ : Vec Type n}
-                             → υ instantiates Forall αₛ τ given τ→υ
-                             → αₛ all∉freeₙ Forall nil τ
-                             → υ ≡ₜ τ
-  instantiates-nonfree-irrel (Mono υ≡τ) _ = υ≡τ
-  instantiates-nonfree-irrel {τ = τ} {αₛ = cons α₀ αₛ} (Poly x₀ xₛ) (cons y₀ yₛ)
-    = {!!}
-
   ∈free₀-resp-≡ᵣ : ∀ {β τ υ}
                  → υ ≡ₜ τ
                  → β ∈free₀ τ
@@ -192,6 +182,25 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
                  → β ∈freeₙ Forall αₛ υ
   ∈freeₙ-resp-≡ᵣ υ≡τ (Mono x) = Mono (∈free₀-resp-≡ᵣ υ≡τ x)
   ∈freeₙ-resp-≡ᵣ υ≡τ (Poly x x₁) = Poly x (∈freeₙ-resp-≡ᵣ υ≡τ x₁)
+
+  quantification-doesn't-free : ∀ {τ β n} {αₛ : Quantifiers n}
+                              → β ∈freeₙ Forall αₛ τ
+                              → β ∈freeₙ Forall nil τ
+  quantification-doesn't-free (Mono x) = Mono x
+  quantification-doesn't-free (Poly x x₁) = quantification-doesn't-free x₁
+
+  instantiation-doesn't-free : ∀ {τ υ n}
+                                 {αₛ : Quantifiers n}
+                                 {τ→υ : Vec Type n}
+                             → υ instantiates Forall αₛ τ given τ→υ
+                             → αₛ all∉freeₙ Forall nil τ
+                             → υ ≡ₜ τ
+  instantiation-doesn't-free (Mono υ≡τ) _ = υ≡τ
+  instantiation-doesn't-free {τ = τ} {αₛ = cons α₀ αₛ} (Poly {τ′ = τ′} {υ₀ = υ₀} x₀ xₛ) (cons y₀ yₛ)
+    = ≡ₜ-trans (subs-nonfree-equiv {φ = υ₀} {αₛ = αₛ} x₀ (contraposition quantification-doesn't-free y₀′))
+               (instantiation-doesn't-free xₛ yₛ)
+      where y₀′ : α₀ ∉freeₙ Forall nil τ′
+            y₀′ x = y₀ (∈freeₙ-resp-≡ᵣ (≡ₜ-sym (instantiation-doesn't-free xₛ yₛ)) x)
 
   instantiates-trans : ∀ {τ υ φ n₁ n₂}
                          {αₛ : Quantifiers n₁}
@@ -218,17 +227,24 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
                      φ-βₛυ-υ→φ
                        with β₀ ∈freeₙ? Forall nil τ
   ... | yes y = contradiction y β₀-αₛτ
-  ... | no  n = nil , Mono (≡ₜ-trans (instantiates-nonfree-irrel φ-βₛυ-υ→φ {! (cons β₀-αₛτ βₛ-αₛτ)!}) υ≡τ)
+  ... | no  n = nil , Mono (≡ₜ-trans (instantiation-doesn't-free φ-βₛυ-υ→φ (lemma υ≡τ (cons β₀-αₛτ βₛ-αₛτ))) υ≡τ)
     where lemma : ∀ {τ υ n} {βₛ : Quantifiers n}
                 → υ ≡ₜ τ
                 → βₛ all∉freeₙ Forall nil τ
                 → βₛ all∉freeₙ Forall nil υ
-          lemma {βₛ = βₛ} υ≡τ x = all-map (λ x∉τ x∈υ → x∉τ (∈freeₙ-resp-≡ᵣ {!≡ₜ-sym!} x∈υ)) x
-  instantiates-trans {αₛ = cons α₀ αₛ}
+          lemma {βₛ = βₛ} υ≡τ x = all-map (λ x∉τ x∈υ → x∉τ (∈freeₙ-resp-≡ᵣ (≡ₜ-sym υ≡τ) x∈υ)) x
+  instantiates-trans {τ} {υ} {φ} {suc n₁′} {n₂}
+                     {αₛ = cons α₀ αₛ}
+                     {βₛ}
+                     {τ→υ}
+                     {υ→φ}
                      βₛ-αₛτ
                      υ-αₛτ-τ→υ
                      φ-βₛυ-υ→φ
-                       = {!!}
+                       = cons {!!} (proj₁ istep)
+                       , Poly {!!} (proj₂ istep)
+    where istep : Σ[ τ→φ ∈ Vec Type n₁′ ] φ instantiates Forall αₛ τ given τ→φ
+          istep = instantiates-trans {!!} {!!} {!!}
 
   all∉freeₙ-trans : ∀ {τ υ n₁ n₂}
                       {αₛ : Quantifiers n₁}
