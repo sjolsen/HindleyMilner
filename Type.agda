@@ -63,9 +63,10 @@ module Type {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
   ≡ₜ-refl {Func τ₀ τ₁} = Func ≡ₜ-refl ≡ₜ-refl
 
   ≡ₜ-sym : Symmetric _≡ₜ_
-  ≡ₜ-sym (TVar x) = {!!}
-  ≡ₜ-sym (Prim x) = {!!}
-  ≡ₜ-sym (Func i₀≡j₀ i₁≡j₁) = {!!}
+  ≡ₜ-sym (TVar α≡β)         = TVar (≡ₜᵥ-sym α≡β)
+  ≡ₜ-sym (Prim ι≡κ)         = Prim (≡ᵢ-sym ι≡κ)
+  ≡ₜ-sym (Func i₀≡j₀ i₁≡j₁) = Func (≡ₜ-sym i₀≡j₀)
+                                   (≡ₜ-sym i₁≡j₁)
 
   ≡ₜ-trans : Transitive _≡ₜ_
   ≡ₜ-trans (TVar i≡j)         (TVar j≡k)         = TVar (≡ₜᵥ-trans i≡j j≡k)
