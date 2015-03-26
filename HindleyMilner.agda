@@ -175,8 +175,23 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
                              → αₛ all∉freeₙ Forall nil τ
                              → υ ≡ₜ τ
   instantiates-nonfree-irrel (Mono υ≡τ) _ = υ≡τ
-  instantiates-nonfree-irrel {τ = τ} {αₛ = cons α₀ αₛ} (Poly x₀ xₛ) (cons y₀ yₛ) = ≡ₜ-trans {!!}
-                                                                                            (instantiates-nonfree-irrel xₛ yₛ)
+  instantiates-nonfree-irrel {τ = τ} {αₛ = cons α₀ αₛ} (Poly x₀ xₛ) (cons y₀ yₛ)
+    = {!!}
+
+  ∈free₀-resp-≡ᵣ : ∀ {β τ υ}
+                 → υ ≡ₜ τ
+                 → β ∈free₀ τ
+                 → β ∈free₀ υ
+  ∈free₀-resp-≡ᵣ (TVar x) (TVar x₁) = TVar (≡ₜᵥ-trans x₁ (≡ₜᵥ-sym x))
+  ∈free₀-resp-≡ᵣ (Func υ≡τ υ≡τ₁) (Funcₗ x) = Funcₗ (∈free₀-resp-≡ᵣ υ≡τ x)
+  ∈free₀-resp-≡ᵣ (Func υ≡τ υ≡τ₁) (Funcᵣ x) = Funcᵣ (∈free₀-resp-≡ᵣ υ≡τ₁ x)
+
+  ∈freeₙ-resp-≡ᵣ : ∀ {β τ υ n} {αₛ : Quantifiers n}
+                 → υ ≡ₜ τ
+                 → β ∈freeₙ Forall αₛ τ
+                 → β ∈freeₙ Forall αₛ υ
+  ∈freeₙ-resp-≡ᵣ υ≡τ (Mono x) = Mono (∈free₀-resp-≡ᵣ υ≡τ x)
+  ∈freeₙ-resp-≡ᵣ υ≡τ (Poly x x₁) = Poly x (∈freeₙ-resp-≡ᵣ υ≡τ x₁)
 
   instantiates-trans : ∀ {τ υ φ n₁ n₂}
                          {αₛ : Quantifiers n₁}
@@ -200,10 +215,15 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
                      {υ→φ = cons υ→φ₀ υ→φₛ}
                      (cons β₀-αₛτ βₛ-αₛτ)
                      (Mono υ≡τ)
-                     (Poly φ-β₀υ-υ→φ φ-βₛυ-υ→φ)
+                     φ-βₛυ-υ→φ
                        with β₀ ∈freeₙ? Forall nil τ
   ... | yes y = contradiction y β₀-αₛτ
-  ... | no  n = nil , Mono {!!}
+  ... | no  n = nil , Mono (≡ₜ-trans (instantiates-nonfree-irrel φ-βₛυ-υ→φ {! (cons β₀-αₛτ βₛ-αₛτ)!}) υ≡τ)
+    where lemma : ∀ {τ υ n} {βₛ : Quantifiers n}
+                → υ ≡ₜ τ
+                → βₛ all∉freeₙ Forall nil τ
+                → βₛ all∉freeₙ Forall nil υ
+          lemma {βₛ = βₛ} υ≡τ x = all-map (λ x∉τ x∈υ → x∉τ (∈freeₙ-resp-≡ᵣ {!≡ₜ-sym!} x∈υ)) x
   instantiates-trans {αₛ = cons α₀ αₛ}
                      βₛ-αₛτ
                      υ-αₛτ-τ→υ
