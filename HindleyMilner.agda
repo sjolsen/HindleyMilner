@@ -151,7 +151,7 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
                      → υ ≡[ φ / β ] Forall αₛ τ
                      → β ∉freeₙ Forall αₛ τ
                      → υ ≡ₜ τ
-  subs-nonfree-equiv {τ = TVar α}     {β = β} {αₛ = nil} x y with α ≟ₜᵥ β
+  subs-nonfree-equiv {τ = TVar α} {β = β} {αₛ = nil} x y with α ≟ₜᵥ β
   ... | yes p = contradiction (Mono (TVar (≡ₜᵥ-sym p))) y
   ... | no ¬p = x
   subs-nonfree-equiv {Prim ι} {αₛ = nil} (Prim x) y = Prim x
@@ -164,7 +164,9 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
           ¬p₀′ (Mono x) = ¬p₀ x
           ¬p₁′ : β ∉freeₙ Forall nil τ₁
           ¬p₁′ (Mono x) = ¬p₁ x
-  subs-nonfree-equiv {αₛ = cons α₀ αₛ} x y = {!!}
+  subs-nonfree-equiv {τ} {υ} {φ} {β} {αₛ = cons α₀ αₛ} x y with β ∈freeₙ? Forall (cons α₀ αₛ) τ
+  ... | yes p = contradiction p y
+  ... | no ¬p = x
 
   instantiates-nonfree-irrel : ∀ {τ υ n}
                                  {αₛ : Quantifiers n}
@@ -173,9 +175,8 @@ module HindleyMilner {c₀ ℓ₀} (primitiveType : DecSetoid c₀ ℓ₀)
                              → αₛ all∉freeₙ Forall nil τ
                              → υ ≡ₜ τ
   instantiates-nonfree-irrel (Mono υ≡τ) _ = υ≡τ
-  instantiates-nonfree-irrel {τ = τ} {αₛ = cons α₀ αₛ} (Poly x₀ xₛ) (cons y₀ yₛ) with α₀ ∈freeₙ? Forall nil τ
-  ... | yes y = contradiction y y₀
-  ... | no  _ = {!!}
+  instantiates-nonfree-irrel {τ = τ} {αₛ = cons α₀ αₛ} (Poly x₀ xₛ) (cons y₀ yₛ) = ≡ₜ-trans {!!}
+                                                                                            (instantiates-nonfree-irrel xₛ yₛ)
 
   instantiates-trans : ∀ {τ υ φ n₁ n₂}
                          {αₛ : Quantifiers n₁}
